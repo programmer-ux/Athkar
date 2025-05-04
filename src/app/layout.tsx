@@ -30,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl" suppressHydrationWarning> {/* Add suppressHydrationWarning for next-themes */}
+    <html lang="ar" dir="rtl" suppressHydrationWarning>{/* Add suppressHydrationWarning for next-themes */}
       <body
         className={cn(
           inter.variable, // Apply base font variable
