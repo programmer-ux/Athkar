@@ -10,48 +10,54 @@ import { useState, useEffect } from 'react';
 interface AthkarItemProps {
   athkar: Athkar;
   isCompleted: boolean;
-  // Ensure the prop accepts the ID as an argument
-  onToggleComplete: (id: string) => void;
+  onToggleComplete: (id: string) => void; // Handler expects ID
 }
 
 export function AthkarItem({ athkar, isCompleted, onToggleComplete }: AthkarItemProps) {
-  const [isVisible, setIsVisible] = useState(true); // For fade-out animation
-  const [isHidden, setIsHidden] = useState(false); // To keep track if it *should* be hidden based on prop
+  const [isVisible, setIsVisible] = useState(!isCompleted); // Initially visible if not completed
+  const [isHidden, setIsHidden] = useState(isCompleted); // Initially hidden if completed
+  // Initialize remainingCount based on whether it's already completed or not
+  const [remainingCount, setRemainingCount] = useState(isCompleted ? 0 : athkar.count);
 
-  // Effect to manage visual state based on isCompleted prop
+  // Effect to manage visual state and count based on isCompleted prop (from parent/localStorage)
   useEffect(() => {
     if (isCompleted) {
       setIsVisible(false); // Start fade-out
-      // Set a timer matching the animation duration to set display:none effectively
+      setRemainingCount(0); // Ensure count is 0 if marked completed externally (e.g., load)
       const timer = setTimeout(() => {
-        setIsHidden(true); // Mark as hidden for potential layout removal by parent
+        setIsHidden(true); // Mark as hidden for layout removal
       }, 300); // Match transition duration
       return () => clearTimeout(timer); // Cleanup timer
     } else {
-      // If becoming incomplete, reset states immediately or with slight delay for animation
+      // If becoming incomplete (e.g., on reset), reset states
+      setRemainingCount(athkar.count); // Reset count to original
       setIsHidden(false); // Ensure it's not hidden
-      // Use requestAnimationFrame to ensure the element is rendered before starting transition
+      // Use rAF to ensure the element is rendered before starting transition
       requestAnimationFrame(() => {
         setIsVisible(true); // Start fade-in
       });
     }
-  }, [isCompleted]);
+  }, [isCompleted, athkar.count]); // Depend on isCompleted and the original count
 
   const handleTap = () => {
-    // Call the passed handler only if not already completed
+    // Only allow tapping if not already marked as completed in parent state
     if (!isCompleted) {
-        // Pass the specific athkar's ID
-        onToggleComplete(athkar.id);
+      if (remainingCount > 1) {
+        // Decrement count but don't mark complete yet
+        setRemainingCount((prevCount) => prevCount - 1);
+      } else if (remainingCount === 1) {
+        // This is the last tap needed
+        setRemainingCount(0); // Visually update count immediately
+        onToggleComplete(athkar.id); // Trigger completion in parent state/localStorage
+        // The useEffect listening to the 'isCompleted' prop will handle the fade-out animation
+      }
+      // If remainingCount is already 0, do nothing on tap
     }
-    // The actual state change and re-render triggering the useEffect above
-    // happens in the parent component (AthkarList)
   };
 
   // Conditionally render null based on the isHidden state managed by useEffect
-  // This allows the fade-out animation to complete before removing from DOM flow
-  if (isHidden && isCompleted) {
-     // Only return null if it's intended to be hidden *and* marked as completed.
-     // This prevents it from disappearing during the brief moment isCompleted might be false before animation reset.
+  // This ensures the fade-out animation completes before removing from layout
+  if (isHidden) {
     return null;
   }
 
@@ -60,34 +66,36 @@ export function AthkarItem({ athkar, isCompleted, onToggleComplete }: AthkarItem
       className={cn(
         'mb-4 cursor-pointer transition-all duration-300 ease-in-out', // Combined transitions
         !isVisible ? 'opacity-0 scale-95' : 'opacity-100 scale-100', // Fade and scale animation
-        isCompleted && isVisible ? 'border-accent bg-accent/30' : '', // Style for completed *while visible*
-        // Prevent applying completed styles if it's supposed to be hidden, looks smoother
+        // No specific style needed for completed here, as it will be hidden
       )}
       onClick={handleTap}
       role="button" // Accessibility
       aria-pressed={isCompleted} // Accessibility
       aria-label={`ذكر: ${athkar.text.substring(0, 30)}...`} // Accessibility
-      style={{ display: isHidden && isCompleted ? 'none' : undefined }} // Directly control display based on final hidden state
+      // style={{ display: isHidden ? 'none' : undefined }} // Removed as returning null handles this
     >
       <CardContent className="p-4">
         <p className={cn(
-            "arabic text-lg leading-relaxed mb-2 transition-colors duration-300", // Added transition for text color
-            isCompleted ? "text-muted-foreground line-through" : "text-card-foreground" // Mute text and add line-through when completed
+            "arabic text-lg leading-relaxed mb-2 transition-colors duration-300",
+             // Text style depends only on whether it's conceptually "done" (count 0)
+            remainingCount <= 0 ? "text-muted-foreground line-through" : "text-card-foreground"
             )}>
             {athkar.text}
         </p>
         <div className="flex justify-between items-center text-sm text-muted-foreground">
-           {athkar.count > 1 && (
+           {/* Show badge only if original count > 1 AND conceptually not done (remaining > 0) */}
+           {athkar.count > 1 && remainingCount > 0 && (
              <Badge variant="secondary" className={cn(
-                 "transition-colors duration-300", // Added transition for badge colors
-                 isCompleted ? "bg-accent/50 text-accent-foreground" : "bg-primary/10 text-primary" // Adjust badge style when completed
+                 "transition-colors duration-300 bg-primary/10 text-primary" // Consistent style while active
                  )}>
-               {athkar.count} مرات
+               {remainingCount} مرات
              </Badge>
            )}
-          {athkar.reference && <span>{athkar.reference}</span>}
+           {/* Ensure reference is always visible until hidden */}
+          {athkar.reference && <span className={cn(remainingCount <= 0 ? "text-muted-foreground/80" : "")}>{athkar.reference}</span>}
         </div>
       </CardContent>
     </Card>
   );
 }
+
