@@ -5,22 +5,23 @@ import type { Athkar } from '@/types';
 import { AthkarItem } from './athkar-item';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Circle, CheckCircle2 } from 'lucide-react'; // Added Circle and CheckCircle2 icons
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import useLocalStorage from '@/hooks/use-local-storage';
+import { cn } from '@/lib/utils'; // Import cn for conditional classes
 
 interface AthkarListProps {
   title: string;
   athkarList: Athkar[];
   categoryKey: string; // Unique key for localStorage, e.g., 'morning_completed'
-  onComplete?: () => void; // Optional callback when list is completed
+  // Removed onComplete prop
 }
 
 type CompletedState = {
   [id: string]: boolean;
 };
 
-export function AthkarList({ title, athkarList, categoryKey, onComplete }: AthkarListProps) {
+export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) {
    // Check if window is defined before accessing localStorage
     const initialCompletedState = typeof window !== 'undefined'
     ? JSON.parse(window.localStorage.getItem(categoryKey) || '{}')
@@ -45,15 +46,7 @@ export function AthkarList({ title, athkarList, categoryKey, onComplete }: Athka
     return Object.values(completedAthkar).filter(Boolean).length;
   }, [completedAthkar, clientLoaded]);
 
-  // Effect to check for completion and call onComplete
-  useEffect(() => {
-    if (clientLoaded && totalCount > 0 && completedCount >= totalCount) {
-      onComplete?.(); // Call the callback if provided
-    }
-    // Intentionally disable onComplete dependency warning if it causes issues,
-    // as its identity should ideally be stable or handled carefully if it changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [completedCount, totalCount, clientLoaded]); // Re-run when counts or loaded status change
+  // Removed useEffect that called onComplete
 
    const handleToggleComplete = useCallback((id: string) => {
      // Ensure update happens only on client
@@ -68,13 +61,12 @@ export function AthkarList({ title, athkarList, categoryKey, onComplete }: Athka
    const handleReset = useCallback(() => {
     if (typeof window !== 'undefined') {
         setCompletedAthkar({});
-        // Optionally, if the parent needs to know about the reset (e.g., to make it visible again)
-        // you might need another callback here. But for simple reset, this is enough.
     }
   }, [setCompletedAthkar]); // Add setCompletedAthkar dependency
 
 
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+  const isComplete = clientLoaded && totalCount > 0 && completedCount >= totalCount;
 
    if (!clientLoaded) {
     // Render a loading state or placeholder until client hydration is complete
@@ -101,7 +93,14 @@ export function AthkarList({ title, athkarList, categoryKey, onComplete }: Athka
   return (
     <div className="mb-8">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-primary">{title}</h2>
+        <div className="flex items-center gap-2"> {/* Wrapper for title and icon */}
+            {isComplete ? (
+                 <CheckCircle2 className="h-6 w-6 text-primary" /> // Checkmark icon when complete, purple color
+             ) : (
+                 <Circle className="h-6 w-6 text-muted-foreground" /> // Circle icon when incomplete
+            )}
+            <h2 className="text-2xl font-bold text-primary">{title}</h2>
+        </div>
          {totalCount > 0 && (
            <Button variant="ghost" size="icon" onClick={handleReset} aria-label="Reset progress">
              <RefreshCw className="h-5 w-5" />
