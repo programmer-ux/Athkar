@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google'; // Keep Inter or Geist as a fallback/base
 import { Noto_Naskh_Arabic } from 'next/font/google'; // Import Arabic font
@@ -8,6 +9,7 @@ import { ThemeProvider } from '@/components/theme-provider'; // Import ThemeProv
 import { ThemeToggle } from '@/components/theme-toggle'; // Import ThemeToggle
 import { NotificationToggle } from '@/components/notification-toggle'; // Import NotificationToggle
 import { ServiceWorkerRegister } from '@/components/service-worker-register'; // Import ServiceWorkerRegister
+import { BottomNavigation } from '@/components/bottom-navigation'; // Import BottomNavigation
 
 // Keep Geist or Inter if desired for non-Arabic text, or remove if Noto Naskh covers everything needed.
 const inter = Inter({ subsets: ['latin'], variable: '--font-geist-sans' }); // Using Inter as example
@@ -46,13 +48,15 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-          <div className="container mx-auto max-w-2xl p-4 min-h-screen">
+          <div className="container mx-auto max-w-2xl p-4 min-h-screen flex flex-col">
              <header className="flex justify-end items-center gap-2 mb-4"> {/* Container for toggles */}
                 <NotificationToggle />
                 <ThemeToggle />
              </header>
-             <main>{children}</main>
+             {/* Adjust main content area with padding-bottom for the navigation */}
+             <main className="flex-grow pb-20">{children}</main>
           </div>
+          <BottomNavigation /> {/* Add Bottom Navigation */}
           <Toaster /> {/* Add Toaster for potential notifications */}
           <ServiceWorkerRegister /> {/* Register the service worker */}
         </ThemeProvider>
