@@ -9,6 +9,7 @@ import { RefreshCw, Circle, CheckCircle2 } from 'lucide-react'; // Added Circle 
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { cn } from '@/lib/utils'; // Import cn for conditional classes
+import { safeJsonParse } from '@/lib/utils'; // Import safeJsonParse
 
 interface AthkarListProps {
   title: string;
@@ -22,27 +23,29 @@ type CompletedState = {
 };
 
 export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) {
-   // Check if window is defined before accessing localStorage
-    const initialCompletedState = typeof window !== 'undefined'
-    ? JSON.parse(window.localStorage.getItem(categoryKey) || '{}')
-    : {};
+   // Safely load initial completed state from localStorage
+   const initialCompletedState = safeJsonParse<CompletedState>(categoryKey) ?? {};
 
-  const [completedAthkar, setCompletedAthkar] = useLocalStorage<CompletedState>(
-      categoryKey,
-      initialCompletedState
-    );
-  const [clientLoaded, setClientLoaded] = useState(false);
+   const [completedAthkar, setCompletedAthkar] = useLocalStorage<CompletedState>(
+       categoryKey,
+       initialCompletedState
+     );
+   const [clientLoaded, setClientLoaded] = useState(false);
 
 
    // Ensure localStorage is only accessed client-side after mount
    useEffect(() => {
     setClientLoaded(true);
-  }, []); // Only run once on mount
+   }, []); // Only run once on mount
 
   const totalCount = athkarList.length;
 
   const completedCount = useMemo(() => {
     if (!clientLoaded) return 0; // Don't calculate server-side or before hydration
+    // Ensure completedAthkar is an object before trying to access values
+     if (typeof completedAthkar !== 'object' || completedAthkar === null) {
+       return 0;
+     }
     return Object.values(completedAthkar).filter(Boolean).length;
   }, [completedAthkar, clientLoaded]);
 
@@ -51,10 +54,14 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
    const handleToggleComplete = useCallback((id: string) => {
      // Ensure update happens only on client
     if (typeof window !== 'undefined') {
-        setCompletedAthkar((prev) => ({
-         ...prev,
-         [id]: !prev[id], // Toggle state
-        }));
+        setCompletedAthkar((prev) => {
+           // Ensure prev is an object
+           const currentPrev = typeof prev === 'object' && prev !== null ? prev : {};
+           return {
+               ...currentPrev,
+               [id]: !currentPrev[id], // Toggle state
+           };
+         });
     }
   }, [setCompletedAthkar]); // Add setCompletedAthkar dependency
 
@@ -122,7 +129,8 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
           <AthkarItem
             key={`${categoryKey}-${athkar.id}`} // Use a more unique key involving categoryKey
             athkar={athkar}
-            isCompleted={!!completedAthkar[athkar.id]} // Ensure boolean value
+            // Ensure completedAthkar exists and has the id property before accessing
+            isCompleted={!!(completedAthkar && completedAthkar[athkar.id])}
             onToggleComplete={handleToggleComplete} // Pass the memoized handler
           />
         ))

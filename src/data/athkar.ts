@@ -1,3 +1,4 @@
+
 // src/data/athkar.ts
 import type { Athkar } from '@/types';
 
@@ -33,6 +34,27 @@ export const morningAthkar: Athkar[] = [
     count: 3,
     reference: 'أبو داود والترمذي',
   },
+  {
+    id: 'm5',
+    category: 'Morning',
+    text: 'اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لَا إِلَهَ إِلَّا أَنْتَ.',
+    count: 3,
+    reference: 'أبو داود',
+  },
+  {
+    id: 'm6',
+    category: 'Morning',
+    text: 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ، وَالْفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لَا إِلَهَ إِلَّا أَنْتَ.',
+    count: 3,
+    reference: 'أبو داود',
+  },
+  {
+    id: 'm7',
+    category: 'Morning',
+    text: 'يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ أَصْلِحْ لِي شَأْنِي كُلَّهُ وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ.',
+    count: 1,
+    reference: 'الحاكم',
+  }
 ];
 
 export const eveningAthkar: Athkar[] = [
@@ -64,7 +86,37 @@ export const eveningAthkar: Athkar[] = [
     count: 3,
     reference: 'أبو داود والترمذي',
   },
+  {
+    id: 'e5',
+    category: 'Evening',
+    text: 'اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لَا إِلَهَ إِلَّا أَنْتَ.',
+    count: 3,
+    reference: 'أبو داود',
+  },
+  {
+    id: 'e6',
+    category: 'Evening',
+    text: 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ، وَالْفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لَا إِلَهَ إِلَّا أَنْتَ.',
+    count: 3,
+    reference: 'أبو داود',
+  },
 ];
 
 // Add other categories as needed (e.g., After Prayer, Sleep)
-export const allAthkar = [...morningAthkar, ...eveningAthkar];
+export const afterPrayerAthkar: Athkar[] = [
+    { id: 'p1', category: 'After Prayer', text: 'أَسْتَغْفِرُ اللَّهَ', count: 3, reference: 'مسلم'},
+    { id: 'p2', category: 'After Prayer', text: 'اللَّهُمَّ أَنْتَ السَّلاَمُ، وَمِنْكَ السَّلاَمُ، تَبَارَكْتَ يَا ذَا الْجَلاَلِ وَالْإِكْرَامِ.', count: 1, reference: 'مسلم'},
+    { id: 'p3', category: 'After Prayer', text: 'سُبْحَانَ اللَّهِ', count: 33, reference: 'متفق عليه'},
+    { id: 'p4', category: 'After Prayer', text: 'الْحَمْدُ لِلَّهِ', count: 33, reference: 'متفق عليه'},
+    { id: 'p5', category: 'After Prayer', text: 'اللَّهُ أَكْبَرُ', count: 33, reference: 'متفق عليه'},
+    { id: 'p6', category: 'After Prayer', text: 'لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ، وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.', count: 1, reference: 'متفق عليه'},
+];
+
+export const sleepAthkar: Athkar[] = [
+    { id: 's1', category: 'Sleep', text: 'بِاسْمِكَ رَبِّ وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، إِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ.', count: 1, reference: 'متفق عليه'},
+    { id: 's2', category: 'Sleep', text: 'اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ.', count: 3, reference: 'أبو داود'},
+    { id: 's3', category: 'Sleep', text: 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا.', count: 1, reference: 'البخاري'},
+];
+
+// Combine all lists for the library
+export const allAthkar = [...morningAthkar, ...eveningAthkar, ...afterPrayerAthkar, ...sleepAthkar];
