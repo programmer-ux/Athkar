@@ -15,20 +15,20 @@ body {
 
 @layer base {
   :root {
-    /* Calm Blue theme */
+    /* Light Theme - Calm Blue */
     --background: 0 0% 100%; /* White background */
     --foreground: 210 10% 23%; /* Dark gray text */
     --card: 0 0% 100%;
     --card-foreground: 210 10% 23%;
     --popover: 0 0% 100%;
     --popover-foreground: 210 10% 23%;
-    --primary: 207 90% 61%; /* #42A5F5 */
+    --primary: 207 90% 61%; /* #42A5F5 - Blue */
     --primary-foreground: 0 0% 100%; /* White text on primary */
-    --secondary: 0 0% 88%; /* #E0E0E0 */
+    --secondary: 0 0% 96.1%; /* Light Gray */
     --secondary-foreground: 210 10% 23%; /* Dark gray text on secondary */
     --muted: 0 0% 96.1%; /* Slightly lighter gray */
     --muted-foreground: 0 0% 45.1%; /* Gray text */
-    --accent: 125 39% 75%; /* #A5D6A7 - Soft Green */
+    --accent: 125 39% 90%; /* Lighter Soft Green #D7EBD8 (adjusted for better contrast) */
     --accent-foreground: 125 20% 30%; /* Darker green text on accent */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
@@ -41,6 +41,7 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    /* Sidebar specific variables remain unchanged unless requested */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -52,31 +53,32 @@ body {
   }
 
   .dark {
-    /* Optional: Define dark mode colors if needed later */
-    --background: 210 10% 10%;
-    --foreground: 0 0% 98%;
-    --card: 210 10% 10%;
+    /* Dark Theme - Adjusted Calm Blue */
+    --background: 210 10% 10%; /* Very Dark Blue/Gray */
+    --foreground: 0 0% 98%; /* Almost White */
+    --card: 210 10% 12%; /* Slightly lighter than background */
     --card-foreground: 0 0% 98%;
     --popover: 210 10% 10%;
     --popover-foreground: 0 0% 98%;
-    --primary: 207 90% 61%;
+    --primary: 207 90% 61%; /* Keep primary blue */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 15%; /* Darker Gray */
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 125 39% 75%;
-    --accent-foreground: 125 20% 30%;
-    --destructive: 0 62.8% 30.6%;
+    --secondary: 210 10% 20%; /* Darker Gray */
+    --secondary-foreground: 0 0% 90%; /* Slightly off-white */
+    --muted: 210 10% 20%;
+    --muted-foreground: 0 0% 63.9%; /* Lighter Gray Text */
+    --accent: 125 39% 30%; /* Darker Soft Green */
+    --accent-foreground: 125 30% 85%; /* Lighter Green text on dark accent */
+    --destructive: 0 62.8% 50.6%; /* Adjusted destructive */
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 207 90% 61%;
+    --border: 210 10% 25%; /* Darker border */
+    --input: 210 10% 25%;
+    --ring: 207 90% 61%; /* Keep ring same as primary */
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    /* Sidebar specific dark variables remain unchanged unless requested */
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -94,5 +96,7 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    /* Add smooth transition for color changes */
+    @apply transition-colors duration-200;
   }
 }

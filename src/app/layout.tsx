@@ -4,6 +4,8 @@ import { Noto_Naskh_Arabic } from 'next/font/google'; // Import Arabic font
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster'; // Import Toaster
+import { ThemeProvider } from '@/components/theme-provider'; // Import ThemeProvider
+import { ThemeToggle } from '@/components/theme-toggle'; // Import ThemeToggle
 
 // Keep Geist or Inter if desired for non-Arabic text, or remove if Noto Naskh covers everything needed.
 const inter = Inter({ subsets: ['latin'], variable: '--font-geist-sans' }); // Using Inter as example
@@ -28,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl"> {/* Set lang to Arabic and direction to RTL */}
+    <html lang="ar" dir="rtl" suppressHydrationWarning> {/* Add suppressHydrationWarning for next-themes */}
       <body
         className={cn(
           inter.variable, // Apply base font variable
@@ -36,10 +38,20 @@ export default function RootLayout({
           'antialiased'
         )}
       >
-        <main className="container mx-auto max-w-2xl p-4 min-h-screen"> {/* Add container and padding */}
-          {children}
-        </main>
-        <Toaster /> {/* Add Toaster for potential notifications */}
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+          <div className="container mx-auto max-w-2xl p-4 min-h-screen">
+             <div className="flex justify-end mb-4"> {/* Container for the toggle */}
+                <ThemeToggle />
+             </div>
+             <main>{children}</main>
+          </div>
+          <Toaster /> {/* Add Toaster for potential notifications */}
+        </ThemeProvider>
       </body>
     </html>
   );
