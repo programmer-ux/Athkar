@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster'; // Import Toaster
 import { ThemeProvider } from '@/components/theme-provider'; // Import ThemeProvider
 import { ThemeToggle } from '@/components/theme-toggle'; // Import ThemeToggle
+import { NotificationToggle } from '@/components/notification-toggle'; // Import NotificationToggle
+import { ServiceWorkerRegister } from '@/components/service-worker-register'; // Import ServiceWorkerRegister
 
 // Keep Geist or Inter if desired for non-Arabic text, or remove if Noto Naskh covers everything needed.
 const inter = Inter({ subsets: ['latin'], variable: '--font-geist-sans' }); // Using Inter as example
@@ -30,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl" suppressHydrationWarning>{/* Add suppressHydrationWarning for next-themes */}
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body
         className={cn(
           inter.variable, // Apply base font variable
@@ -45,12 +47,14 @@ export default function RootLayout({
             disableTransitionOnChange
           >
           <div className="container mx-auto max-w-2xl p-4 min-h-screen">
-             <div className="flex justify-end mb-4"> {/* Container for the toggle */}
+             <header className="flex justify-end items-center gap-2 mb-4"> {/* Container for toggles */}
+                <NotificationToggle />
                 <ThemeToggle />
-             </div>
+             </header>
              <main>{children}</main>
           </div>
           <Toaster /> {/* Add Toaster for potential notifications */}
+          <ServiceWorkerRegister /> {/* Register the service worker */}
         </ThemeProvider>
       </body>
     </html>
