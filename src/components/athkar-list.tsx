@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Athkar } from '@/types';
@@ -5,20 +6,21 @@ import { AthkarItem } from './athkar-item';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import useLocalStorage from '@/hooks/use-local-storage';
 
 interface AthkarListProps {
   title: string;
   athkarList: Athkar[];
   categoryKey: string; // Unique key for localStorage, e.g., 'morning_completed'
+  onComplete?: () => void; // Optional callback when list is completed
 }
 
 type CompletedState = {
   [id: string]: boolean;
 };
 
-export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) {
+export function AthkarList({ title, athkarList, categoryKey, onComplete }: AthkarListProps) {
    // Check if window is defined before accessing localStorage
     const initialCompletedState = typeof window !== 'undefined'
     ? JSON.parse(window.localStorage.getItem(categoryKey) || '{}')
@@ -34,12 +36,26 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
    // Ensure localStorage is only accessed client-side after mount
    useEffect(() => {
     setClientLoaded(true);
-    // Optionally re-read from localStorage here if hydration issues persist
-    // const currentStorage = JSON.parse(window.localStorage.getItem(categoryKey) || '{}');
-    // setCompletedAthkar(currentStorage);
-  }, [categoryKey]); // Removed setCompletedAthkar dependency
+  }, []); // Only run once on mount
 
-  const handleToggleComplete = (id: string) => {
+  const totalCount = athkarList.length;
+
+  const completedCount = useMemo(() => {
+    if (!clientLoaded) return 0; // Don't calculate server-side or before hydration
+    return Object.values(completedAthkar).filter(Boolean).length;
+  }, [completedAthkar, clientLoaded]);
+
+  // Effect to check for completion and call onComplete
+  useEffect(() => {
+    if (clientLoaded && totalCount > 0 && completedCount >= totalCount) {
+      onComplete?.(); // Call the callback if provided
+    }
+    // Intentionally disable onComplete dependency warning if it causes issues,
+    // as its identity should ideally be stable or handled carefully if it changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completedCount, totalCount, clientLoaded]); // Re-run when counts or loaded status change
+
+   const handleToggleComplete = useCallback((id: string) => {
      // Ensure update happens only on client
     if (typeof window !== 'undefined') {
         setCompletedAthkar((prev) => ({
@@ -47,31 +63,35 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
          [id]: !prev[id], // Toggle state
         }));
     }
-  };
+  }, [setCompletedAthkar]); // Add setCompletedAthkar dependency
 
-   const handleReset = () => {
+   const handleReset = useCallback(() => {
     if (typeof window !== 'undefined') {
         setCompletedAthkar({});
+        // Optionally, if the parent needs to know about the reset (e.g., to make it visible again)
+        // you might need another callback here. But for simple reset, this is enough.
     }
-  };
+  }, [setCompletedAthkar]); // Add setCompletedAthkar dependency
 
-  const completedCount = useMemo(() => {
-    if (!clientLoaded) return 0; // Don't calculate server-side or before hydration
-    return Object.values(completedAthkar).filter(Boolean).length;
-  }, [completedAthkar, clientLoaded]);
 
-  const totalCount = athkarList.length;
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
    if (!clientLoaded) {
     // Render a loading state or placeholder until client hydration is complete
      return (
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4 text-primary">{title}</h2>
+      <div className="mb-8 animate-pulse">
+        <div className="flex justify-between items-center mb-4">
+             <div className="h-7 bg-muted rounded w-1/3"></div>
+             <div className="h-8 w-8 bg-muted rounded-full"></div>
+         </div>
+         <div className='mb-4'>
+            <div className="h-2 bg-muted rounded w-full mb-1"></div>
+             <div className="h-3 bg-muted rounded w-1/4 mx-auto"></div>
+         </div>
         <div className="space-y-4">
-            <div className="h-10 bg-gray-200 rounded w-full animate-pulse"></div>
-            <div className="h-10 bg-gray-200 rounded w-full animate-pulse"></div>
-            <div className="h-10 bg-gray-200 rounded w-full animate-pulse"></div>
+            <div className="h-20 bg-muted rounded-lg w-full"></div>
+            <div className="h-20 bg-muted rounded-lg w-full"></div>
+            <div className="h-20 bg-muted rounded-lg w-full"></div>
         </div>
        </div>
     );
@@ -101,10 +121,10 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
       {athkarList.length > 0 ? (
         athkarList.map((athkar) => (
           <AthkarItem
-            key={athkar.id}
+            key={`${categoryKey}-${athkar.id}`} // Use a more unique key involving categoryKey
             athkar={athkar}
             isCompleted={!!completedAthkar[athkar.id]} // Ensure boolean value
-            onToggleComplete={() => handleToggleComplete(athkar.id)}
+            onToggleComplete={handleToggleComplete} // Pass the memoized handler
           />
         ))
       ) : (
