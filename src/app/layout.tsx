@@ -6,8 +6,8 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster'; // Import Toaster
 import { ThemeProvider } from '@/components/theme-provider'; // Import ThemeProvider
-import { ThemeToggle } from '@/components/theme-toggle'; // Import ThemeToggle
-import { NotificationToggle } from '@/components/notification-toggle'; // Import NotificationToggle
+// Removed ThemeToggle import
+// Removed NotificationToggle import
 import { ServiceWorkerRegister } from '@/components/service-worker-register'; // Import ServiceWorkerRegister
 import { BottomNavigation } from '@/components/bottom-navigation'; // Import BottomNavigation
 
@@ -49,12 +49,9 @@ export default function RootLayout({
             disableTransitionOnChange
           >
           <div className="container mx-auto max-w-2xl p-4 min-h-screen flex flex-col">
-             <header className="flex justify-end items-center gap-2 mb-4"> {/* Container for toggles */}
-                <NotificationToggle />
-                <ThemeToggle />
-             </header>
+             {/* Removed header containing toggles */}
              {/* Adjust main content area with padding-bottom for the navigation */}
-             <main className="flex-grow pb-20">{children}</main>
+             <main className="flex-grow pb-20 pt-4">{children}</main> {/* Added pt-4 for spacing */}
           </div>
           <BottomNavigation /> {/* Add Bottom Navigation */}
           <Toaster /> {/* Add Toaster for potential notifications */}
