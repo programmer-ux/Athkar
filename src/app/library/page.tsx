@@ -1,4 +1,6 @@
 
+"use client"; // Add 'use client' directive
+
 // src/app/library/page.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -47,7 +49,7 @@ export default function LibraryPage() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => handleAddToDaily(athkar.id)}
+                onClick={() => handleAddToDaily(athkar.id)} // onClick is now allowed
                 aria-label={`إضافة "${athkar.text.substring(0, 20)}..." إلى قائمة اليوم`}
               >
                 <PlusCircle className="h-5 w-5 text-primary" />

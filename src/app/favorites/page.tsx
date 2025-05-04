@@ -1,4 +1,6 @@
 
+"use client"; // Add 'use client' directive
+
 // src/app/favorites/page.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HeartOff } from "lucide-react"; // Icon for removing favorite
@@ -37,7 +39,7 @@ export default function FavoritesPage() {
                <Button
                  variant="ghost"
                  size="icon"
-                 onClick={() => handleRemoveFavorite(athkar.id)}
+                 onClick={() => handleRemoveFavorite(athkar.id)} // onClick is now allowed
                  aria-label={`إزالة "${athkar.text.substring(0, 20)}..." من المفضلة`}
                >
                  <HeartOff className="h-5 w-5 text-destructive" />
