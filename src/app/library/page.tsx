@@ -9,6 +9,7 @@ import { allAthkar } from '@/data/athkar'; // Import all Athkar to find the one 
 import { useToast } from "@/hooks/use-toast";
 import type { Athkar } from "@/types";
 import { useEffect, useState } from "react";
+import { cn } from '@/lib/utils'; // Import cn utility function
 
 // Key for storing the custom daily Athkar list in localStorage
 const CUSTOM_DAILY_ATHKAR_KEY = 'custom_daily_athkar_v1';
