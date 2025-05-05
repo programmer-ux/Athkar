@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -6,9 +5,9 @@ import { AthkarList } from '@/components/athkar-list';
 import { morningAthkar, eveningAthkar } from '@/data/athkar';
 import { Separator } from '@/components/ui/separator';
 import type { Athkar } from '@/types';
-import useLocalStorage from '@/hooks/use-local-storage'; // Import useLocalStorage
-import { safeJsonParse } from '@/lib/utils'; // Import safeJsonParse
-import { libraryCategories } from '@/data/athkar'; // Import library categories to structure custom lists
+import useLocalStorage from '@/hooks/use-local-storage';
+import { safeJsonParse } from '@/lib/utils';
+import { libraryCategories } from '@/data/athkar';
 
 // Key for storing the custom daily Athkar list IN STORAGE (contains ALL added Athkar IDs)
 const CUSTOM_DAILY_ATHKAR_STORAGE_KEY = 'custom_daily_athkar_v1';
@@ -48,7 +47,7 @@ export default function Home() {
   }, [storedCustomAthkar]); // Rerun effect if the value from useLocalStorage changes
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6"> {/* Reduced spacing from space-y-8 */}
       <header className="text-center py-6">
         {/* Icon */}
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12 mx-auto text-primary mb-2">
@@ -58,36 +57,42 @@ export default function Home() {
         <p className="text-muted-foreground mt-1 arabic">مهام يومية بسيطة لأذكارك الصحيحة</p>
       </header>
 
-      {/* Morning Athkar */}
+      {/* Morning Athkar - Now acts as a link */}
       <AthkarList
         title="أذكار الصباح"
         athkarList={morningAthkar}
-        categoryKey="morning_completed_v1" // Keep unique key for default lists
+        categoryKey="morning" // Using simplified key for routing
       />
-      <Separator className="my-6" />
+      {/* Optional Separator if needed */}
+      {/* <Separator className="my-4" /> */}
 
-      {/* Evening Athkar */}
+      {/* Evening Athkar - Now acts as a link */}
       <AthkarList
         title="أذكار المساء"
         athkarList={eveningAthkar}
-        categoryKey="evening_completed_v1" // Keep unique key for default lists
+        categoryKey="evening" // Using simplified key for routing
       />
 
       {/* Custom Daily Athkar Lists - Render based on processed state */}
+      {clientLoaded && Object.keys(customAthkarLists).length > 0 && (
+         // Optional Separator before custom lists if desired
+         <Separator className="my-4" />
+       )}
       {clientLoaded && Object.entries(customAthkarLists).map(([categoryKey, listData]) => (
         listData.list.length > 0 && ( // Only render if the list actually has items for this user
-          <div key={categoryKey}>
-            <Separator className="my-6" />
-            <AthkarList
-              title={listData.title} // Use the title from the grouped data
-              athkarList={listData.list} // Use the filtered list for this category
-              categoryKey={`${CUSTOM_LIST_COMPLETED_KEY_PREFIX}${categoryKey}`} // Use a unique key for completion state based on category
-              // Optional: Add functionality to remove items/lists later
-            />
-          </div>
+          <AthkarList
+            key={categoryKey}
+            title={listData.title} // Use the title from the grouped data
+            athkarList={listData.list} // Use the filtered list for this category
+            categoryKey={categoryKey} // Use the library category key directly for routing
+          />
         )
       ))}
 
+      {!clientLoaded && (
+          // Skeleton loading for lists if needed, or keep simple text
+          <p className="text-muted-foreground text-center py-10">جاري تحميل القوائم...</p>
+      )}
 
       <footer className="text-center text-xs text-muted-foreground py-4 mt-8">
         <p>تطبيق مجاني بدون إعلانات. تم إضافة الأحاديث الصحيحة فقط (بإذن الله).</p>
