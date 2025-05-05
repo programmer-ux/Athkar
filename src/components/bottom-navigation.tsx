@@ -3,13 +3,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Library, Heart, Settings } from 'lucide-react';
+import { Home, Library, Settings } from 'lucide-react'; // Removed Heart icon
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/', label: 'اليوم', icon: Home },
   { href: '/library', label: 'المكتبة', icon: Library },
-  { href: '/favorites', label: 'المفضلة', icon: Heart },
+  // Removed favorites item: { href: '/favorites', label: 'المفضلة', icon: Heart },
   { href: '/settings', label: 'الإعدادات', icon: Settings },
 ];
 
