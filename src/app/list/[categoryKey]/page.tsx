@@ -7,7 +7,7 @@ import { AthkarItem } from '@/components/athkar-item';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, RefreshCw, CheckSquare } from 'lucide-react';
+import { ArrowRight, RefreshCw, CheckSquare } from 'lucide-react'; // Changed ArrowLeft to ArrowRight
 import { getAthkarListByCategory, type AthkarListData } from '@/data/athkar';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { safeJsonParse } from '@/lib/utils';
@@ -142,8 +142,8 @@ export default function AthkarListPage() {
   if (!listData) {
     return (
       <div className="space-y-6 p-4 text-center">
-         <Button variant="ghost" size="icon" onClick={() => router.back()} aria-label="العودة للصفحة الرئيسية">
-            <ArrowLeft className="h-6 w-6" />
+         <Button variant="ghost" size="icon" onClick={() => router.back()} aria-label="العودة للقائمة السابقة"> {/* Changed aria-label */}
+            <ArrowRight className="h-6 w-6" /> {/* Changed Icon */}
         </Button>
         <h1 className="text-2xl font-bold text-destructive arabic">لم يتم العثور على القائمة</h1>
         <p className="text-muted-foreground arabic">لم نتمكن من تحميل الأذكار لهذه الفئة.</p>
@@ -156,8 +156,8 @@ export default function AthkarListPage() {
      <TooltipProvider>
         <div className="space-y-4 p-4">
              <div className="flex items-center justify-between mb-4">
-                  <Button variant="ghost" size="icon" onClick={() => router.back()} aria-label="العودة">
-                      <ArrowLeft className="h-6 w-6" />
+                  <Button variant="ghost" size="icon" onClick={() => router.back()} aria-label="العودة للقائمة السابقة"> {/* Changed aria-label */}
+                      <ArrowRight className="h-6 w-6" /> {/* Changed Icon */}
                   </Button>
                   <div className="flex items-center gap-1">
                       <Tooltip>
