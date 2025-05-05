@@ -4,7 +4,7 @@
 import type { Athkar } from '@/types';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Circle, CheckCircle2, CheckSquare } from 'lucide-react'; // Removed ArrowLeft
+import { RefreshCw, BookOpen, CheckSquare } from 'lucide-react'; // Import BookOpen, replace Circle/CheckCircle2
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { cn } from '@/lib/utils';
@@ -16,8 +16,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Link from 'next/link'; // Import Link
-import { Card, CardContent, CardHeader } from '@/components/ui/card'; // Import Card components
+import Link from 'next/link';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { useParams } from 'next/navigation'; // Import useParams
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
+// Removed i18n imports
 
 interface AthkarListProps {
   title: string;
@@ -30,6 +33,12 @@ type CompletedState = {
 };
 
 export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) {
+   const params = useParams(); // Get route parameters
+   // Ensure locale is treated as 'en' or 'ar', default to 'ar' if invalid/missing
+   const locale = (params.locale === 'en' || params.locale === 'ar') ? params.locale : 'ar';
+   // const t = useScopedI18n('athkarList'); // Scope translations
+
+
    // Get the correct storage key using the category key
    const storageKey = useMemo(() => {
      const listData = getAthkarListByCategory(categoryKey);
@@ -51,7 +60,6 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
    useEffect(() => {
     setClientLoaded(true);
     // No need to re-fetch initial state here, useLocalStorage handles it.
-    // We might need to force a re-read if storageKey changes, but categoryKey should be stable per instance.
    }, []); // Only run once on mount
 
   const totalCount = athkarList.length;
@@ -121,23 +129,27 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
   return (
     <TooltipProvider>
         <Card className="mb-4 transition-shadow hover:shadow-md">
-            <Link href={`/list/${encodeURIComponent(categoryKey)}`} legacyBehavior>
+            <Link href={`/${locale}/list/${encodeURIComponent(categoryKey)}`} legacyBehavior>
                 <a className="block cursor-pointer">
                     <CardHeader>
                         <div className="flex justify-between items-center gap-2">
                           <div className="flex items-center gap-2">
-                              {isComplete ? (
-                                  <CheckCircle2 className="h-6 w-6 text-primary" />
-                              ) : (
-                                  <Circle className="h-6 w-6 text-muted-foreground" />
-                              )}
-                              <h2 className="text-2xl font-bold text-primary">{title}</h2>
+                              {/* Updated Icon Logic */}
+                              <BookOpen
+                                className={cn(
+                                  "h-6 w-6",
+                                  isComplete ? "text-primary fill-current" : "text-muted-foreground"
+                                )}
+                                aria-hidden="true"
+                              />
+                              <h2 className={cn("text-2xl font-bold", isComplete ? "text-primary" : "text-foreground")}>{title}</h2>
                           </div>
                         </div>
                     </CardHeader>
                     <CardContent className="pt-0">
                         <div className='mb-4'>
-                              <Progress value={progress} className="w-full h-2 mb-1" />
+                              {/* Make progress bar thicker */}
+                              <Progress value={progress} className="w-full h-3 mb-1" />
                               <p className="text-sm text-muted-foreground text-center">
                               {completedCount} / {totalCount}
                             </p>
@@ -152,7 +164,7 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
                     variant="ghost"
                     size="icon"
                     onClick={(e) => { e.stopPropagation(); handleMarkAllComplete(); }}
-                    aria-label="Mark all as complete"
+                    aria-label="Mark all as complete" // Consider using t('markAllComplete') if i18n is restored
                     disabled={isComplete}
                     className={cn("h-8 w-8", isComplete ? "text-muted-foreground" : "text-primary hover:text-primary/80")}
                     >
@@ -160,7 +172,7 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>وضع علامة "مكتمل"</p>
+                    <p>وضع علامة "مكتمل"</p> {/* Consider using t('markAllCompleteTooltip') */}
                 </TooltipContent>
                 </Tooltip>
 
@@ -170,14 +182,14 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
                         variant="ghost"
                         size="icon"
                         onClick={(e) => { e.stopPropagation(); handleReset(); }}
-                        aria-label="Reset progress"
+                        aria-label="Reset progress" // Consider using t('resetProgress')
                         className="h-8 w-8"
                     >
                         <RefreshCw className="h-5 w-5" />
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>إعادة تعيين</p>
+                    <p>إعادة تعيين</p> {/* Consider using t('resetTooltip') */}
                 </TooltipContent>
                 </Tooltip>
             </CardContent>
@@ -185,3 +197,4 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
     </TooltipProvider>
   );
 }
+
