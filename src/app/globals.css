@@ -104,15 +104,6 @@ body {
     @apply text-foreground;
   }
 
-  /* Specifically target primary-colored headers if needed by adding text-primary class directly in components*/
-  /* Removed the problematic @apply rules causing circular dependency */
-  /* .light .text-primary { */
-     /* @apply text-primary; */ /* REMOVED */
-   /* } */
-   /* .dark .text-primary { */
-       /* @apply text-primary; */ /* REMOVED */
-   /* } */
-
    /* Explicitly set CardTitle color to foreground */
     .card-title {
         @apply text-foreground;
