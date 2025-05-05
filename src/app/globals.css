@@ -15,21 +15,21 @@ body {
 
 @layer base {
   :root {
-    /* Light Theme - Green */
+    /* Light Theme - Black */
     --background: 0 0% 100%; /* White background */
     --foreground: 0 0% 3.9%; /* Black text for light mode */
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 142.1 70.6% 45.3%; /* #4CAF50 - Green */
+    --primary: 0 0% 3.9%; /* Black text for light mode */
     --primary-foreground: 0 0% 98%; /* White text on primary */
     --secondary: 0 0% 96.1%; /* Light Gray */
     --secondary-foreground: 0 0% 9%; /* Dark gray text on secondary */
     --muted: 0 0% 96.1%; /* Slightly lighter gray */
     --muted-foreground: 0 0% 45.1%; /* Gray text */
-    --accent: 142.1 70.6% 95%; /* Lighter Green for accent */
-    --accent-foreground: 142.1 70.6% 20%; /* Darker green text on accent */
+    --accent: 0 0% 3.9%; /* Black text for light mode */
+    --accent-foreground: 0 0% 3.9%; /* Black text for light mode */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 89.8%; /* Slightly darker border */
