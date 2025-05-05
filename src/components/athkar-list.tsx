@@ -4,7 +4,7 @@
 import type { Athkar } from '@/types';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, BookOpen, CheckSquare } from 'lucide-react'; // Import BookOpen, replace Circle/CheckCircle2
+import { RefreshCw, BookOpen, CheckSquare } from 'lucide-react'; // Keep BookOpen
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import useLocalStorage from '@/hooks/use-local-storage';
 import { cn } from '@/lib/utils';
@@ -114,7 +114,7 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
         </CardHeader>
         <CardContent>
              <div className='mb-4'>
-                <div className="h-2 bg-muted rounded w-full mb-1"></div>
+                <div className="h-3 bg-muted rounded w-full mb-1"></div> {/* Adjusted height */}
                  <div className="h-3 bg-muted rounded w-1/4 mx-auto"></div>
              </div>
         </CardContent>
@@ -134,11 +134,11 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
                     <CardHeader>
                         <div className="flex justify-between items-center gap-2">
                           <div className="flex items-center gap-2">
-                              {/* Updated Icon Logic */}
+                              {/* Updated Icon Logic - Reverted */}
                               <BookOpen
                                 className={cn(
                                   "h-6 w-6",
-                                  isComplete ? "text-primary fill-current" : "text-muted-foreground"
+                                  isComplete ? "text-primary fill-current" : "text-muted-foreground" // Fill when complete
                                 )}
                                 aria-hidden="true"
                               />
@@ -149,7 +149,7 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
                     <CardContent className="pt-0">
                         <div className='mb-4'>
                               {/* Make progress bar thicker */}
-                              <Progress value={progress} className="w-full h-3 mb-1" />
+                              <Progress value={progress} className="w-full h-3 mb-1" /> {/* Increased height */}
                               <p className="text-sm text-muted-foreground text-center">
                               {completedCount} / {totalCount}
                             </p>
@@ -197,4 +197,3 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
     </TooltipProvider>
   );
 }
-
