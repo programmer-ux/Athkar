@@ -1,3 +1,4 @@
+
 // src/app/list/[categoryKey]/page.tsx
 "use client";
 
@@ -18,6 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useToast } from "@/hooks/use-toast"; // Import useToast for feedback
 
 type CompletedState = {
   [id: string]: boolean;
@@ -35,6 +37,7 @@ export default function AthkarListPage() {
   const params = useParams();
   const router = useRouter();
   const categoryKey = params.categoryKey ? decodeURIComponent(params.categoryKey as string) : null;
+  const { toast } = useToast(); // Initialize toast
 
   // Derive storageKey synchronously based on the categoryKey param
   const storageKey = useMemo(() => getStorageKey(categoryKey), [categoryKey]);
@@ -122,6 +125,28 @@ export default function AthkarListPage() {
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
   const isComplete = clientLoaded && totalCount > 0 && completedCount >= totalCount;
 
+  // Effect to handle automatic navigation when list is completed
+  useEffect(() => {
+    // Ensure this runs only on the client, after load, and when isComplete changes to true
+    if (clientLoaded && isComplete) {
+      // Optional: Show a toast message before navigating
+      toast({
+        title: "اكتمل!",
+        description: `تم إكمال قائمة "${listData?.title ?? 'الأذكار'}". العودة للصفحة الرئيسية...`,
+        duration: 2000, // Show toast for 2 seconds
+      });
+
+      // Navigate back to the home page after a short delay
+      const timer = setTimeout(() => {
+        router.push('/'); // Navigate to home page
+      }, 2000); // Wait 2 seconds (matching toast duration)
+
+      // Cleanup function to clear the timer if the component unmounts
+      // or if isComplete becomes false again before navigation happens
+      return () => clearTimeout(timer);
+    }
+  }, [clientLoaded, isComplete, router, toast, listData?.title]); // Add dependencies
+
 
   if (isLoading || !clientLoaded) {
     // Keep Skeleton loading state
@@ -129,7 +154,7 @@ export default function AthkarListPage() {
        <div className="space-y-6 p-4">
             <Skeleton className="h-8 w-1/4" /> {/* Back button */}
             <Skeleton className="h-10 w-3/4" /> {/* Title */}
-            <Skeleton className="h-2 w-full" /> {/* Progress */}
+            <Skeleton className="h-3 w-full" /> {/* Progress Bar - Increased Height */}
             <Skeleton className="h-4 w-1/4 mx-auto" /> {/* Count */}
             <div className="space-y-4 pt-4">
                 <Skeleton className="h-24 w-full rounded-lg" />
@@ -209,7 +234,7 @@ export default function AthkarListPage() {
             {/* Progress Bar and Count */}
             {totalCount > 0 && (
             <div className='mb-4'>
-                <Progress value={progress} className="w-full h-3 mb-1" /> {/* Increased height */}
+                 <Progress value={progress} className="w-full h-3 mb-1" /> {/* Increased Height */}
                 <p className="text-sm text-muted-foreground text-center">
                     {completedCount} / {totalCount}
                 </p>
@@ -237,3 +262,4 @@ export default function AthkarListPage() {
     </TooltipProvider>
   );
 }
+
