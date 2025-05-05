@@ -60,9 +60,6 @@ export default function AthkarListPage() {
     setIsLoading(false);
   }, [categoryKey]); // Re-run only if categoryKey changes
 
-  // Removed the second useEffect that tried to sync completedAthkar,
-  // as useLocalStorage should handle the initial load correctly.
-
   const totalCount = listData?.list.length ?? 0;
 
   const completedCount = useMemo(() => {
@@ -212,7 +209,7 @@ export default function AthkarListPage() {
             {/* Progress Bar and Count */}
             {totalCount > 0 && (
             <div className='mb-4'>
-                <Progress value={progress} className="w-full h-2 mb-1" />
+                <Progress value={progress} className="w-full h-3 mb-1" /> {/* Increased height */}
                 <p className="text-sm text-muted-foreground text-center">
                     {completedCount} / {totalCount}
                 </p>

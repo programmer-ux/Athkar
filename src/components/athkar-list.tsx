@@ -18,9 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { useParams } from 'next/navigation'; // Import useParams
 import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
-// Removed i18n imports
 
 interface AthkarListProps {
   title: string;
@@ -33,12 +31,6 @@ type CompletedState = {
 };
 
 export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) {
-   const params = useParams(); // Get route parameters
-   // Ensure locale is treated as 'en' or 'ar', default to 'ar' if invalid/missing
-   const locale = (params.locale === 'en' || params.locale === 'ar') ? params.locale : 'ar';
-   // const t = useScopedI18n('athkarList'); // Scope translations
-
-
    // Get the correct storage key using the category key
    const storageKey = useMemo(() => {
      const listData = getAthkarListByCategory(categoryKey);
@@ -129,7 +121,7 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
   return (
     <TooltipProvider>
         <Card className="mb-4 transition-shadow hover:shadow-md">
-            <Link href={`/${locale}/list/${encodeURIComponent(categoryKey)}`} legacyBehavior>
+            <Link href={`/list/${encodeURIComponent(categoryKey)}`} legacyBehavior>
                 <a className="block cursor-pointer">
                     <CardHeader>
                         <div className="flex justify-between items-center gap-2">
@@ -164,7 +156,7 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
                     variant="ghost"
                     size="icon"
                     onClick={(e) => { e.stopPropagation(); handleMarkAllComplete(); }}
-                    aria-label="Mark all as complete" // Consider using t('markAllComplete') if i18n is restored
+                    aria-label="Mark all as complete"
                     disabled={isComplete}
                     className={cn("h-8 w-8", isComplete ? "text-muted-foreground" : "text-primary hover:text-primary/80")}
                     >
@@ -172,7 +164,7 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>وضع علامة "مكتمل"</p> {/* Consider using t('markAllCompleteTooltip') */}
+                    <p>وضع علامة "مكتمل"</p>
                 </TooltipContent>
                 </Tooltip>
 
@@ -182,14 +174,14 @@ export function AthkarList({ title, athkarList, categoryKey }: AthkarListProps) 
                         variant="ghost"
                         size="icon"
                         onClick={(e) => { e.stopPropagation(); handleReset(); }}
-                        aria-label="Reset progress" // Consider using t('resetProgress')
+                        aria-label="Reset progress"
                         className="h-8 w-8"
                     >
                         <RefreshCw className="h-5 w-5" />
                     </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                    <p>إعادة تعيين</p> {/* Consider using t('resetTooltip') */}
+                    <p>إعادة تعيين</p>
                 </TooltipContent>
                 </Tooltip>
             </CardContent>

@@ -11,8 +11,6 @@ import { libraryCategories } from '@/data/athkar';
 
 // Key for storing the custom daily Athkar list IN STORAGE (contains ALL added Athkar IDs)
 const CUSTOM_DAILY_ATHKAR_STORAGE_KEY = 'custom_daily_athkar_v1';
-// Key prefix for storing the COMPLETION state of each custom list category
-const CUSTOM_LIST_COMPLETED_KEY_PREFIX = 'custom_list_completed_';
 
 export default function Home() {
   // State holds the structured lists for display
@@ -63,8 +61,6 @@ export default function Home() {
         athkarList={morningAthkar}
         categoryKey="morning" // Using simplified key for routing
       />
-      {/* Optional Separator if needed */}
-      {/* <Separator className="my-4" /> */}
 
       {/* Evening Athkar - Now acts as a link */}
       <AthkarList
@@ -75,7 +71,6 @@ export default function Home() {
 
       {/* Custom Daily Athkar Lists - Render based on processed state */}
       {clientLoaded && Object.keys(customAthkarLists).length > 0 && (
-         // Optional Separator before custom lists if desired
          <Separator className="my-4" />
        )}
       {clientLoaded && Object.entries(customAthkarLists).map(([categoryKey, listData]) => (

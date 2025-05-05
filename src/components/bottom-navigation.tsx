@@ -20,11 +20,12 @@ export function BottomNavigation() {
     <nav className="fixed bottom-0 left-0 right-0 h-16 bg-background border-t border-border shadow-md z-50">
       <div className="flex justify-around items-center h-full max-w-2xl mx-auto px-4">
         {navItems.map((item) => {
+          // Simple path matching without locale
           const isActive = pathname === item.href;
           return (
             <Link
               key={item.href}
-              href={item.href}
+              href={item.href} // Use direct href without locale
               className={cn(
                 'flex flex-col items-center justify-center text-xs w-16 transition-colors duration-200',
                 isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
