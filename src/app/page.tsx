@@ -1,5 +1,5 @@
 
-"use client"; // Required because we are using state and effects
+"use client";
 
 import { useState, useEffect } from 'react';
 import { AthkarList } from '@/components/athkar-list';
@@ -7,37 +7,45 @@ import { morningAthkar, eveningAthkar } from '@/data/athkar';
 import { Separator } from '@/components/ui/separator';
 import type { Athkar } from '@/types';
 import useLocalStorage from '@/hooks/use-local-storage'; // Import useLocalStorage
+import { safeJsonParse } from '@/lib/utils'; // Import safeJsonParse
+import { libraryCategories } from '@/data/athkar'; // Import library categories to structure custom lists
 
-// Key for storing the custom daily Athkar list in localStorage
-const CUSTOM_DAILY_ATHKAR_KEY = 'custom_daily_athkar_v1';
-// Key for storing the completion state of the custom list
-const CUSTOM_DAILY_COMPLETED_KEY = 'custom_daily_completed_v1';
+// Key for storing the custom daily Athkar list IN STORAGE (contains ALL added Athkar IDs)
+const CUSTOM_DAILY_ATHKAR_STORAGE_KEY = 'custom_daily_athkar_v1';
+// Key prefix for storing the COMPLETION state of each custom list category
+const CUSTOM_LIST_COMPLETED_KEY_PREFIX = 'custom_list_completed_';
 
 export default function Home() {
-  const [customAthkarList, setCustomAthkarList] = useState<Athkar[]>([]);
-  // Use useLocalStorage to reactively update when the list changes elsewhere
-  const [storedCustomList] = useLocalStorage<Athkar[]>(CUSTOM_DAILY_ATHKAR_KEY, []);
+  // State holds the structured lists for display
+  const [customAthkarLists, setCustomAthkarLists] = useState<Record<string, { title: string; list: Athkar[] }>>({});
+  // Use useLocalStorage to reactively track CHANGES in the stored list of ALL custom athkar
+  const [storedCustomAthkar] = useLocalStorage<Athkar[]>(CUSTOM_DAILY_ATHKAR_STORAGE_KEY, []);
   const [clientLoaded, setClientLoaded] = useState(false);
 
-  // Load custom list from storage when client loads or storage changes
+  // Process the stored flat list into structured lists for display
   useEffect(() => {
-    // Check if window is defined before accessing localStorage
     if (typeof window !== 'undefined') {
-        const storedListRaw = localStorage.getItem(CUSTOM_DAILY_ATHKAR_KEY);
-        let loadedList: Athkar[] = [];
-        if (storedListRaw) {
-        try {
-            loadedList = JSON.parse(storedListRaw);
-        } catch (e) {
-            console.error("Failed to parse custom daily list from localStorage", e);
-            loadedList = []; // Reset if parsing fails
-        }
-        }
-        setCustomAthkarList(loadedList);
-        setClientLoaded(true); // Indicate client has loaded
-    }
-  }, [storedCustomList]); // Rerun effect if the value from useLocalStorage changes
+      // Load the flat list of all custom Athkar from storage
+      const flatCustomList = safeJsonParse<Athkar[]>(CUSTOM_DAILY_ATHKAR_STORAGE_KEY) ?? [];
 
+      // Group the flat list back into categories based on libraryCategories
+      const groupedLists: Record<string, { title: string; list: Athkar[] }> = {};
+      const customAthkarIds = new Set(flatCustomList.map(a => a.id));
+
+      Object.entries(libraryCategories).forEach(([key, categoryData]) => {
+        const itemsForThisCategory = categoryData.list.filter(item => customAthkarIds.has(item.id));
+        if (itemsForThisCategory.length > 0) {
+          groupedLists[key] = {
+            title: categoryData.title, // Use the original title
+            list: itemsForThisCategory,
+          };
+        }
+      });
+
+      setCustomAthkarLists(groupedLists);
+      setClientLoaded(true); // Indicate client has loaded and processed data
+    }
+  }, [storedCustomAthkar]); // Rerun effect if the value from useLocalStorage changes
 
   return (
     <div className="space-y-8">
@@ -54,7 +62,7 @@ export default function Home() {
       <AthkarList
         title="أذكار الصباح"
         athkarList={morningAthkar}
-        categoryKey="morning_completed_v1"
+        categoryKey="morning_completed_v1" // Keep unique key for default lists
       />
       <Separator className="my-6" />
 
@@ -62,23 +70,24 @@ export default function Home() {
       <AthkarList
         title="أذكار المساء"
         athkarList={eveningAthkar}
-        categoryKey="evening_completed_v1"
+        categoryKey="evening_completed_v1" // Keep unique key for default lists
       />
 
-      {/* Custom Daily Athkar - Only render if list has items and client has loaded */}
-      {clientLoaded && customAthkarList.length > 0 && (
-        <>
-          <Separator className="my-6" />
-          <AthkarList
-            title="أذكار مضافة" // Title for the custom list
-            athkarList={customAthkarList}
-            categoryKey={CUSTOM_DAILY_COMPLETED_KEY} // Use a distinct key for completion state
-            // Optional: Add functionality to remove items from this list later
-            // showRemoveButton={true}
-            // onRemoveItem={handleRemoveCustomItem}
-          />
-        </>
-      )}
+      {/* Custom Daily Athkar Lists - Render based on processed state */}
+      {clientLoaded && Object.entries(customAthkarLists).map(([categoryKey, listData]) => (
+        listData.list.length > 0 && ( // Only render if the list actually has items for this user
+          <div key={categoryKey}>
+            <Separator className="my-6" />
+            <AthkarList
+              title={listData.title} // Use the title from the grouped data
+              athkarList={listData.list} // Use the filtered list for this category
+              categoryKey={`${CUSTOM_LIST_COMPLETED_KEY_PREFIX}${categoryKey}`} // Use a unique key for completion state based on category
+              // Optional: Add functionality to remove items/lists later
+            />
+          </div>
+        )
+      ))}
+
 
       <footer className="text-center text-xs text-muted-foreground py-4 mt-8">
         <p>تطبيق مجاني بدون إعلانات. تم إضافة الأحاديث الصحيحة فقط (بإذن الله).</p>

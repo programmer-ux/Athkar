@@ -1,10 +1,7 @@
-
 // src/data/athkar.ts
 import type { Athkar } from '@/types';
 
-// IMPORTANT: Replace this with a comprehensive and verified list of Athkar.
-// These are just a few examples for demonstration.
-
+// Morning Athkar
 export const morningAthkar: Athkar[] = [
   {
     id: 'm1',
@@ -57,6 +54,7 @@ export const morningAthkar: Athkar[] = [
   }
 ];
 
+// Evening Athkar
 export const eveningAthkar: Athkar[] = [
   {
     id: 'e1',
@@ -102,7 +100,7 @@ export const eveningAthkar: Athkar[] = [
   },
 ];
 
-// Add other categories as needed (e.g., After Prayer, Sleep)
+// After Prayer Athkar
 export const afterPrayerAthkar: Athkar[] = [
     { id: 'p1', category: 'After Prayer', text: 'أَسْتَغْفِرُ اللَّهَ', count: 3, reference: 'مسلم'},
     { id: 'p2', category: 'After Prayer', text: 'اللَّهُمَّ أَنْتَ السَّلاَمُ، وَمِنْكَ السَّلاَمُ، تَبَارَكْتَ يَا ذَا الْجَلاَلِ وَالْإِكْرَامِ.', count: 1, reference: 'مسلم'},
@@ -112,11 +110,27 @@ export const afterPrayerAthkar: Athkar[] = [
     { id: 'p6', category: 'After Prayer', text: 'لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ، وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.', count: 1, reference: 'متفق عليه'},
 ];
 
+// Sleep Athkar
 export const sleepAthkar: Athkar[] = [
     { id: 's1', category: 'Sleep', text: 'بِاسْمِكَ رَبِّ وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، إِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ.', count: 1, reference: 'متفق عليه'},
     { id: 's2', category: 'Sleep', text: 'اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ.', count: 3, reference: 'أبو داود'},
     { id: 's3', category: 'Sleep', text: 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا.', count: 1, reference: 'البخاري'},
 ];
 
-// Combine all lists for the library
-export const allAthkar = [...morningAthkar, ...eveningAthkar, ...afterPrayerAthkar, ...sleepAthkar];
+// Structure for the library page - Grouping lists by category key
+export const libraryCategories: Record<string, { title: string; list: Athkar[] }> = {
+  afterPrayer: { title: "أذكار ما بعد الصلاة", list: afterPrayerAthkar },
+  sleep: { title: "أذكار النوم", list: sleepAthkar },
+  // Add other categories here in the future if needed, e.g.:
+  // wakingUp: { title: "أذكار الاستيقاظ", list: wakingUpAthkar },
+};
+
+// Combine ALL Athkar from all defined lists for potential other uses (e.g., search)
+// Note: Morning and Evening are not in 'libraryCategories' as they are default on the main page.
+export const allAthkar = [
+    ...morningAthkar,
+    ...eveningAthkar,
+    ...afterPrayerAthkar,
+    ...sleepAthkar
+    // Add items from any new categories here as well
+];

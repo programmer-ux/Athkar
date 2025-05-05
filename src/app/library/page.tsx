@@ -1,115 +1,120 @@
 
-"use client"; // Add 'use client' directive
+"use client";
 
-// src/app/library/page.tsx
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
-import { allAthkar } from '@/data/athkar'; // Import all Athkar to find the one to add
+import { PlusCircle, CheckCircle } from "lucide-react";
+import { libraryCategories } from '@/data/athkar'; // Import the structured library categories
 import { useToast } from "@/hooks/use-toast";
 import type { Athkar } from "@/types";
 import { useEffect, useState } from "react";
-import { cn } from '@/lib/utils'; // Import cn utility function
+import { cn } from '@/lib/utils';
+import { safeJsonParse } from "@/lib/utils"; // Import safeJsonParse
 
 // Key for storing the custom daily Athkar list in localStorage
 const CUSTOM_DAILY_ATHKAR_KEY = 'custom_daily_athkar_v1';
 
 export default function LibraryPage() {
   const { toast } = useToast();
-  const [libraryAthkar, setLibraryAthkar] = useState<Athkar[]>([]);
   const [customDailyList, setCustomDailyList] = useState<Athkar[]>([]);
   const [clientLoaded, setClientLoaded] = useState(false);
 
-  // Load library and custom list on client mount
+  // Load custom list on client mount
   useEffect(() => {
-    setLibraryAthkar(allAthkar); // Load the full library
-
-    // Load custom daily list from localStorage
-    const storedList = localStorage.getItem(CUSTOM_DAILY_ATHKAR_KEY);
-    if (storedList) {
-      try {
-        setCustomDailyList(JSON.parse(storedList));
-      } catch (e) {
-        console.error("Failed to parse custom daily list from localStorage", e);
-        setCustomDailyList([]); // Reset if parsing fails
-      }
-    }
+    // Load custom daily list from localStorage using safeJsonParse
+    const loadedList = safeJsonParse<Athkar[]>(CUSTOM_DAILY_ATHKAR_KEY) ?? [];
+    setCustomDailyList(loadedList);
     setClientLoaded(true); // Indicate client has loaded
   }, []);
 
-  // Function to add Athkar to the custom daily list
-  const handleAddToDaily = (id: string) => {
+  // Function to add all Athkar from a category/list to the custom daily list
+  const handleAddListToDaily = (categoryKey: string) => {
     if (!clientLoaded) return; // Ensure client is loaded
 
-    const athkarToAdd = libraryAthkar.find((a) => a.id === id);
-    if (!athkarToAdd) {
-      console.error("Athkar not found in library:", id);
-      toast({ title: "خطأ", description: "لم يتم العثور على الذكر.", variant: "destructive" });
+    const categoryData = libraryCategories[categoryKey];
+    if (!categoryData) {
+      console.error("Category not found in library:", categoryKey);
+      toast({ title: "خطأ", description: "لم يتم العثور على هذه المجموعة.", variant: "destructive" });
       return;
     }
 
-    // Check if the Athkar is already in the custom list
-    if (customDailyList.some((a) => a.id === id)) {
-      toast({ title: "موجود بالفعل", description: "هذا الذكر موجود بالفعل في قائمتك اليومية." });
+    const listToAdd = categoryData.list;
+    const currentCustomIds = new Set(customDailyList.map(a => a.id));
+    const newItemsToAdd = listToAdd.filter(item => !currentCustomIds.has(item.id));
+
+    if (newItemsToAdd.length === 0) {
+      toast({ title: "موجودة بالفعل", description: `جميع أذكار "${categoryData.title}" موجودة بالفعل في قائمتك اليومية.` });
       return;
     }
 
-    // Add to the list and save to localStorage
-    const updatedList = [...customDailyList, athkarToAdd];
+    // Add only the new items to the list and save to localStorage
+    const updatedList = [...customDailyList, ...newItemsToAdd];
     try {
       localStorage.setItem(CUSTOM_DAILY_ATHKAR_KEY, JSON.stringify(updatedList));
       setCustomDailyList(updatedList); // Update local state
-      toast({ title: "تمت الإضافة", description: `"${athkarToAdd.text.substring(0, 20)}..." أضيف إلى قائمتك اليومية.` });
+      toast({ title: "تمت الإضافة", description: `تمت إضافة ${newItemsToAdd.length} ${newItemsToAdd.length === 1 ? 'ذكر' : 'أذكار'} من "${categoryData.title}" إلى قائمتك اليومية.` });
     } catch (e) {
       console.error("Failed to save custom daily list to localStorage", e);
-      toast({ title: "خطأ في الحفظ", description: "لم نتمكن من حفظ الذكر في قائمتك.", variant: "destructive" });
+      toast({ title: "خطأ في الحفظ", description: "لم نتمكن من حفظ الأذكار في قائمتك.", variant: "destructive" });
     }
   };
+
+   // Check if all items from a specific list are already in the custom list
+   const isListAlreadyAdded = (categoryKey: string): boolean => {
+    if (!clientLoaded) return false;
+    const categoryData = libraryCategories[categoryKey];
+    if (!categoryData) return false;
+    const customIds = new Set(customDailyList.map(a => a.id));
+    return categoryData.list.every(item => customIds.has(item.id));
+  };
+
 
   return (
     <div className="space-y-6">
       <header className="text-center py-4">
         <h1 className="text-3xl font-bold text-primary arabic">مكتبة الأذكار</h1>
-        <p className="text-muted-foreground mt-1 arabic">استكشف وأضف أذكارًا جديدة ليومك</p>
+        <p className="text-muted-foreground mt-1 arabic">استكشف وأضف مجموعات أذكار جديدة ليومك</p>
       </header>
 
-      {/* Optional Search Bar - Future feature
-      <div className="relative">
-        <Input placeholder="ابحث في المكتبة..." className="pr-10" />
-        <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-      </div> */}
-
       <div className="space-y-4">
-        {clientLoaded && libraryAthkar.map((athkar) => (
-          <Card key={athkar.id}>
-            <CardContent className="p-4 flex items-center justify-between gap-4">
-              <div>
-                <p className="arabic text-lg leading-relaxed mb-1">{athkar.text}</p>
-                <span className="text-sm text-muted-foreground">
-                  (تكرار: {athkar.count}) - {athkar.category}
-                </span>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleAddToDaily(athkar.id)} // Call the implemented handler
-                aria-label={`إضافة "${athkar.text.substring(0, 20)}..." إلى قائمة اليوم`}
-                // Optional: Disable if already added
-                disabled={customDailyList.some(a => a.id === athkar.id)}
-              >
-                <PlusCircle className={cn(
-                    "h-5 w-5",
-                    customDailyList.some(a => a.id === athkar.id) ? "text-muted-foreground" : "text-primary"
-                 )} />
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-         {!clientLoaded && (
-           // Optional: Show skeletons or loading indicator while loading
+        {clientLoaded && Object.entries(libraryCategories).map(([key, categoryData]) => {
+          const alreadyAdded = isListAlreadyAdded(key);
+          return (
+            <Card key={key}>
+              <CardHeader>
+                <CardTitle className="arabic flex items-center justify-between">
+                  {categoryData.title}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleAddListToDaily(key)}
+                    aria-label={`إضافة مجموعة "${categoryData.title}" إلى قائمة اليوم`}
+                    disabled={alreadyAdded}
+                  >
+                    {alreadyAdded ? (
+                      <CheckCircle className="h-6 w-6 text-green-600" />
+                    ) : (
+                      <PlusCircle className="h-6 w-6 text-primary" />
+                    )}
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              {/* We don't display individual items here, just the list title and add button */}
+               {/* Optional: Add a description or count if desired
+               <CardContent>
+                 <p className="text-sm text-muted-foreground">
+                   تحتوي هذه المجموعة على {categoryData.list.length} أذكار.
+                 </p>
+               </CardContent>
+               */}
+            </Card>
+          );
+        })}
+
+        {!clientLoaded && (
            <div className="text-center py-10 text-muted-foreground">جاري تحميل المكتبة...</div>
-         )}
-         {clientLoaded && libraryAthkar.length === 0 && (
+        )}
+        {clientLoaded && Object.keys(libraryCategories).length === 0 && (
            <p className="text-muted-foreground text-center py-10">المكتبة فارغة حالياً.</p>
          )}
       </div>
